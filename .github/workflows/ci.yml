@@ -77,13 +77,13 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/legal_app:latest \
-                       -t ghcr.io/${{ github.repository_owner }}/legal_app:${{ github.sha }} .
+          docker build -t ghcr.io/en22cs301128-png/legal_app:latest \
+                       -t ghcr.io/en22cs301128-png/legal_app:${{ github.sha }} .
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/legal_app:latest
-          docker push ghcr.io/${{ github.repository_owner }}/legal_app:${{ github.sha }}
+          docker push ghcr.io/en22cs301128-png/legal_app:latest
+          docker push ghcr.io/en22cs301128-png/legal_app:${{ github.sha }}
 
   # ─────────────────────────────────────────
   # JOB 3: Deploy to Kubernetes
@@ -91,7 +91,10 @@ jobs:
   deploy:
     name: Deploy to Kubernetes
     needs: build-and-push
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest 
+    permissions:
+    contents: read
+    packages: write
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
