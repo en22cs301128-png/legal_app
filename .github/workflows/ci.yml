@@ -114,3 +114,4 @@ jobs:
 
       - name: Verify deployment
         run: kubectl get pods -l app=legal-app
+
