@@ -41,7 +41,11 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
-          bundler-cache: true
+
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install --jobs 4 --retry 3
 
       - name: Set up database
         run: |
@@ -53,7 +57,6 @@ jobs:
 
   # ─────────────────────────────────────────
   # JOB 2: Build & Push Docker Image
-  # (Only runs on push to main after tests pass)
   # ─────────────────────────────────────────
   build-and-push:
     name: Build & Push Docker Image
@@ -84,7 +87,6 @@ jobs:
 
   # ─────────────────────────────────────────
   # JOB 3: Deploy to Kubernetes
-  # (Only runs after successful image push)
   # ─────────────────────────────────────────
   deploy:
     name: Deploy to Kubernetes
@@ -104,12 +106,9 @@ jobs:
           mkdir -p ~/.kube
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
 
-      - name: Update image tag in deployment
-        run: |
-          sed -i "s|IMAGE_TAG|${{ github.sha }}|g" k8s/deployment.yaml
-
       - name: Deploy to Kubernetes
         run: |
+          sed -i "s|IMAGE_TAG|${{ github.sha }}|g" k8s/deployment.yaml
           kubectl apply -f k8s/
           kubectl rollout status deployment/legal-app --timeout=120s
 
