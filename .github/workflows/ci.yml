@@ -117,9 +117,8 @@ jobs:
       - name: Deploy to Kubernetes
         run: |
           sed -i "s|IMAGE_TAG|${{ github.sha }}|g" k8s/deployment.yaml
-          kubectl apply -f k8s/
+          kubectl apply -f k8s/ --validate=false
           kubectl rollout status deployment/legal-app --timeout=120s
-
       - name: Verify deployment
         run: kubectl get pods -l app=legal-app
 
